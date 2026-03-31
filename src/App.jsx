@@ -7,6 +7,10 @@ function App() {
    const [length, setLength] = useState(8);
 
    const handleGenerate = () => {
+      if (length < 4) {
+         alert("Пароль занадто короткий! Мінімальна довжина: 4");
+         return;
+      }
       const newPassword = generatePassword(length);
       setPassword(newPassword);
    };
