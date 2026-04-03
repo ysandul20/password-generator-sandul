@@ -4,6 +4,6 @@ import { generatePassword } from "./passwordLogic";
 test("generatePassword returns password of correct length", () => {
    const password = generatePassword(10);
 
-   // НАВМИСНА ПОМИЛКА: ми очікуємо довжину 99, хоча замовляли 10
-   expect(password.length).toBe(99);
+   // ВИПРАВЛЕНО: тепер очікуємо правильну довжину
+   expect(password.length).toBe(10);
 });
