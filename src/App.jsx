@@ -15,11 +15,20 @@ function App() {
       setPassword(newPassword);
    };
 
+   // Логіка очищення пароля
+   const handleClear = () => {
+      setPassword("");
+   };
+
    return (
       <div className="app">
          <h1>Генератор паролів</h1>
          <div className="password-display">
-            {password || "Натисніть кнопку"}
+            {password || "Очікування генерації..."} {/* Змінили текст */}
+            {/* Додали кнопку очищення в те саме місце, де в іншій гілці кнопка копіювання */}
+            <button onClick={handleClear} disabled={!password}>
+               Очистити
+            </button>
          </div>
          <Controls
             length={length}
