@@ -1,0 +1,78 @@
+name: CI/CD Pipeline
+
+on:
+   push:
+      branches: ["main"]
+   pull_request:
+      branches: ["main"]
+
+jobs:
+   # === Stage 1: Test ===
+   test:
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v4
+         - name: Setup Node.js
+           uses: actions/setup-node@v4
+           with:
+              node-version: "20"
+         - name: Install dependencies
+           run: npm install
+         - name: Run Unit Tests
+           run: npm test
+
+   # === Stage 2: Build ===
+   build:
+      needs: test # Запускається тільки після успішного test
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v4
+         - name: Create Mock Artifact
+           # Імітуємо збірку: створюємо текстовий файл як артефакт
+           run: echo "Project Build v1.0 - Ready for deployment" > app_build.txt
+         - name: Upload Artifact
+           uses: actions/upload-artifact@v4
+           with:
+              name: my-app-artifact
+              path: app_build.txt
+
+   # === Stage 3: Deploy Staging ===
+   deploy_staging:
+      needs: build # Запускається після build
+      runs-on: ubuntu-latest
+      steps:
+         - name: Download Artifact
+           uses: actions/download-artifact@v4
+           with:
+              name: my-app-artifact
+         - name: Mock Deploy to Staging
+           # Використовуємо скачаний артефакт
+           run: |
+              echo "Deploying application to Staging Environment..."
+              cat app_build.txt
+
+   # === Stage 4: Verify Staging ===
+   verify_staging:
+      needs: deploy_staging # Запускається після деплою на staging
+      runs-on: ubuntu-latest
+      steps:
+         - name: Smoke Test (Verify)
+           # Імітуємо смоук-тест
+           run: |
+              echo "Running post-deploy verification on Staging..."
+              node -e "if(1 !== 1) { throw new Error('Verification failed!'); } else { console.log('Verification passed!'); }"
+
+   # === Stage 5: Deploy Production ===
+   deploy_production:
+      needs: verify_staging # Запускається після verify
+      runs-on: ubuntu-latest
+      environment: production # ТРИГЕРИТЬ MANUAL APPROVAL (Крок 0)
+      steps:
+         - name: Download Artifact
+           uses: actions/download-artifact@v4
+           with:
+              name: my-app-artifact
+         - name: Mock Deploy to Production
+           run: |
+              echo "Deploying application to PRODUCTION Environment..."
+              cat app_build.txt
